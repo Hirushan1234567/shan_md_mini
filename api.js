@@ -3,6 +3,7 @@ import pino from "pino";
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
+
 import {
   default as makeWASocket,
   useMultiFileAuthState,
@@ -10,22 +11,74 @@ import {
 } from "@whiskeysockets/baileys";
 
 const app = express();
-app.use(express.json({ limit: "10kb" }));
 
-const PORT = Number(process.env.API_PORT || 2618);
-const API_KEY = process.env.API_KEY;
-const SESSION_DIR = path.resolve("./user-sessions");
+/* =========================================
+   CONFIGURATION
+========================================= */
+
+const PORT = Number(process.env.PORT || process.env.API_PORT || 3000);
+
+const SESSION_DIR = path.resolve(
+  process.env.USER_SESSIONS_DIR || "./user-sessions"
+);
+
+const API_ENABLED = process.env.API_ENABLED !== "false";
+
+const ALLOW_PUBLIC_PAIR =
+  process.env.ALLOW_PUBLIC_PAIR !== "false";
+
+const API_KEY = process.env.API_KEY || "";
+
+const WEBSITE_ORIGIN =
+  process.env.WEBSITE_ORIGIN ||
+  process.env.CORS_ORIGIN ||
+  "https://beautiful-sable-ec743d.netlify.app";
+
+const PAIR_TIMEOUT_MS = 120000;
 
 fs.mkdirSync(SESSION_DIR, { recursive: true });
 
-const sessions = new Map();
-const requests = new Map();
+app.disable("x-powered-by");
+
+app.use(express.json({ limit: "10kb" }));
+
+/* =========================================
+   CORS
+========================================= */
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin",
-    process.env.WEBSITE_ORIGIN || "https://hirushan1234567.github.io");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  const allowedOrigins = WEBSITE_ORIGIN
+    .split(",")
+    .map(origin => origin.trim())
+    .filter(Boolean);
+
+  const origin = req.headers.origin;
+
+  if (
+    !origin ||
+    allowedOrigins.includes("*") ||
+    allowedOrigins.includes(origin)
+  ) {
+    res.setHeader(
+      "Access-Control-Allow-Origin",
+      allowedOrigins.includes("*") ? "*" : (origin || "*")
+    );
+  }
+
+  res.setHeader(
+    "Vary",
+    "Origin"
+  );
+
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS"
+  );
+
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, x-api-key"
+  );
 
   if (req.method === "OPTIONS") {
     return res.sendStatus(204);
@@ -33,6 +86,29 @@ app.use((req, res, next) => {
 
   next();
 });
+
+/* =========================================
+   SESSION STORAGE
+========================================= */
+
+const sessions = new Map();
+const requests = new Map();
+
+function makeUserId(phone) {
+  return crypto
+    .createHash("sha256")
+    .update(phone)
+    .digest("hex")
+    .slice(0, 24);
+}
+
+function clearRequest(phone) {
+  requests.delete(phone);
+}
+
+/* =========================================
+   HEALTH CHECK
+========================================= */
 
 app.get("/", (_req, res) => {
   res.json({
@@ -42,37 +118,84 @@ app.get("/", (_req, res) => {
   });
 });
 
+app.get("/api/health", (_req, res) => {
+  res.json({
+    success: true,
+    status: "online",
+    service: "SHAN MINI BOT API",
+    timestamp: new Date().toISOString()
+  });
+});
+
+/* =========================================
+   SESSION STATUS
+========================================= */
+
+app.get("/api/status", (_req, res) => {
+  res.json({
+    success: true,
+    status: "online",
+    activeSessions: sessions.size,
+    activePairRequests: requests.size
+  });
+});
+
+/* =========================================
+   PAIR API
+========================================= */
+
 app.post("/api/pair", async (req, res) => {
+  if (!API_ENABLED) {
+    return res.status(503).json({
+      success: false,
+      error: "Pairing API is disabled."
+    });
+  }
+
+  if (!ALLOW_PUBLIC_PAIR) {
+    return res.status(403).json({
+      success: false,
+      error: "Public pairing is disabled."
+    });
+  }
+
+  /*
+   * If API_KEY is configured, the website must send
+   * the matching x-api-key header.
+   */
+  if (API_KEY && req.get("x-api-key") !== API_KEY) {
+    return res.status(401).json({
+      success: false,
+      error: "Unauthorized."
+    });
+  }
+
+  let phone = String(req.body?.phone || "")
+    .replace(/\D/g, "");
+
+  if (!/^\d{8,15}$/.test(phone)) {
+    return res.status(400).json({
+      success: false,
+      error: "Enter a valid international phone number without +."
+    });
+  }
+
+  if (requests.has(phone)) {
+    return res.status(429).json({
+      success: false,
+      error: "A pairing request is already active. Please wait."
+    });
+  }
+
+  const userId = makeUserId(phone);
+  const userDir = path.join(SESSION_DIR, userId);
+
+  let sock;
+  let requestReserved = false;
+
   try {
-    if (!API_KEY || req.get("x-api-key") !== API_KEY) {
-      return res.status(401).json({
-        error: "Unauthorized"
-      });
-    }
-
-    let phone = String(req.body.phone || "").replace(/\D/g, "");
-
-    if (!/^\d{8,15}$/.test(phone)) {
-      return res.status(400).json({
-        error: "Invalid phone number. Use country code without +."
-      });
-    }
-
-    if (requests.has(phone)) {
-      return res.status(429).json({
-        error: "A pairing request is already active for this number."
-      });
-    }
-
     requests.set(phone, Date.now());
-
-    const userId = crypto
-      .createHash("sha256")
-      .update(phone)
-      .digest("hex")
-      .slice(0, 24);
-
-    const userDir = path.join(SESSION_DIR, userId);
+    requestReserved = true;
 
     fs.mkdirSync(userDir, { recursive: true });
 
@@ -80,15 +203,15 @@ app.post("/api/pair", async (req, res) => {
       await useMultiFileAuthState(userDir);
 
     if (state.creds.registered) {
-      requests.delete(phone);
       return res.status(409).json({
-        error: "This session is already registered."
+        success: false,
+        error: "This WhatsApp account already has a saved session."
       });
     }
 
     const { version } = await fetchLatestWaWebVersion();
 
-    const sock = makeWASocket({
+    sock = makeWASocket({
       version,
       auth: state,
       logger: pino({ level: "silent" }),
@@ -108,35 +231,82 @@ app.post("/api/pair", async (req, res) => {
     sock.ev.on("connection.update", ({ connection }) => {
       if (connection === "close") {
         sessions.delete(userId);
-        requests.delete(phone);
       }
     });
 
     const code = await sock.requestPairingCode(phone);
 
-    res.json({
+    return res.json({
       success: true,
+      code,
       pairCode: code,
-      message: "Enter this code in WhatsApp Linked Devices."
+      message: "Open WhatsApp Linked Devices and enter the pairing code."
     });
-  } catch (error) {
-    console.error("Pairing request failed:", error.message);
 
-    res.status(500).json({
-      error: "Could not generate pairing code. Try again later."
+  } catch (error) {
+    console.error(
+      "Pairing request failed:",
+      error?.message || error
+    );
+
+    if (sock) {
+      try {
+        sock.end(undefined);
+      } catch {}
+    }
+
+    sessions.delete(userId);
+
+    return res.status(500).json({
+      success: false,
+      error: "Could not generate a pairing code. Please try again later."
     });
+
   } finally {
-    // Keep active requests reserved briefly to avoid duplicate sockets.
-    setTimeout(() => {
-      for (const [phone, started] of requests) {
-        if (Date.now() - started > 120000) {
-          requests.delete(phone);
-        }
-      }
-    }, 120000).unref();
+    if (requestReserved) {
+      setTimeout(() => {
+        clearRequest(phone);
+      }, PAIR_TIMEOUT_MS).unref();
+    }
   }
 });
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`SHAN MINI BOT API listening on ${PORT}`);
+/* =========================================
+   ERROR HANDLER
+========================================= */
+
+app.use((error, _req, res, _next) => {
+  console.error("API error:", error?.message || error);
+
+  if (res.headersSent) {
+    return;
+  }
+
+  res.status(500).json({
+    success: false,
+    error: "Internal server error."
+  });
 });
+
+/* =========================================
+   START SERVER
+========================================= */
+
+const server = app.listen(PORT, "0.0.0.0", () => {
+  console.log(`SHAN MINI BOT API listening on port ${PORT}`);
+});
+
+function shutdown() {
+  console.log("Shutting down SHAN MINI BOT API...");
+
+  server.close(() => {
+    process.exit(0);
+  });
+
+  setTimeout(() => {
+    process.exit(1);
+  }, 10000).unref();
+}
+
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
