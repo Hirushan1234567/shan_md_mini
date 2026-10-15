@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: shan-mini-bot
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: MONGODB_URI
+        sync: false
+      - key: MAIN_PAIR_NUMBER
+        sync: false
+      - key: PREFIX
+        value: "."
+      - key: CORS_ORIGIN
+        value: "*"
+      - key: LOG_LEVEL
+        value: silent
