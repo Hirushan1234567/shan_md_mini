@@ -1,33 +1,57 @@
+import fs from "fs";
+
+const LOGO_PATH = "./logo.jpg";
+
 export default {
   command: "alive",
 
   async execute(sock, msg) {
     const jid = msg.key.remoteJid;
 
-    const fs = await import("fs");
+    const text = `╭━━━━━━━━━━━━━━━━━━━━━━╮
+        🧑‍💻 SHAN MINI BOT
+               V1
+╰━━━━━━━━━━━━━━━━━━━━━━╯
 
-    const text = `
-╭━━━〔 👑 SHAN MINI BOT 〕━━━╮
-┃
-┃   🟢 STATUS  : ONLINE
-┃   ⚡ SYSTEM  : ACTIVE
-┃   🚀 VERSION : V1
-┃
-┃   💫 I'm alive & ready!
-┃
-╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯
-`;
+             ✦  A L I V E  ✦
 
-    if (fs.existsSync("./logo.jpg")) {
-      await sock.sendMessage(
-        jid,
-        {
-          image: fs.readFileSync("./logo.jpg"),
-          caption: text
-        },
-        { quoted: msg }
+        ╭──────────────╮
+          🟢 ONLINE
+        ╰──────────────╯
+
+     ❝ Always ready, always active ❞
+
+          ⚡ SHAN MINI BOT ⚡
+
+╭━━━━━━━━━━━━━━━━━━━━━━╮
+        ♛ SYSTEM ACTIVE ♛
+╰━━━━━━━━━━━━━━━━━━━━━━╯`;
+
+    try {
+      if (fs.existsSync(LOGO_PATH)) {
+        await sock.sendMessage(
+          jid,
+          {
+            image: fs.readFileSync(LOGO_PATH),
+            caption: text
+          },
+          { quoted: msg }
+        );
+      } else {
+        await sock.sendMessage(
+          jid,
+          {
+            text
+          },
+          { quoted: msg }
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Alive error:",
+        error.message
       );
-    } else {
+
       await sock.sendMessage(
         jid,
         {
