@@ -338,7 +338,7 @@ async function getPairCode() {
     return;
   }
 
-  statusBox.textContent = "⏳ Pairing code එක ලබාගනිමින්...";
+  statusBox.textContent = "⏳ Pairing code ලබාගනිමින්...";
   codeBox.textContent = "";
 
   try {
@@ -360,10 +360,12 @@ async function getPairCode() {
       return;
     }
 
-    codeBox.textContent = data.code || data.pairCode || data.pairingCode || "";
+    codeBox.textContent =
+      data.code || data.pairCode || data.pairingCode || "";
+
     statusBox.textContent = codeBox.textContent
       ? "✅ Pairing code එක ලැබුණා!"
-      : "❌ Pairing code එක response එකේ නැහැ.";
+      : "❌ Pairing code එක ලැබුණේ නැහැ.";
 
   } catch (error) {
     statusBox.textContent =
@@ -372,6 +374,5 @@ async function getPairCode() {
   }
 }
 </script>
-
 </body>
 </html>
