@@ -7,10 +7,7 @@
 
   <title>SHAN MINI BOT V1 | Pair Website</title>
 
-  <meta
-    name="description"
-    content="SHAN MINI BOT V1 WhatsApp Multi-Session Pair Website"
-  >
+  <meta name="description" content="SHAN MINI BOT V1 WhatsApp Pair Website">
 
   <style>
     * {
@@ -35,20 +32,10 @@
       justify-content: center;
       padding: 22px;
       overflow-x: hidden;
-
       background:
-        radial-gradient(
-          ellipse at 50% 0%,
-          #103a70 0%,
-          transparent 55%
-        ),
-        radial-gradient(
-          ellipse at 0% 100%,
-          #071b3d 0%,
-          transparent 45%
-        ),
+        radial-gradient(ellipse at 50% 0%, #103a70 0%, transparent 55%),
+        radial-gradient(ellipse at 0% 100%, #071b3d 0%, transparent 45%),
         var(--background);
-
       color: var(--text);
       font-family: Arial, Helvetica, sans-serif;
     }
@@ -60,11 +47,9 @@
       padding: 32px 25px;
       text-align: center;
       overflow: hidden;
-
       border: 1px solid rgba(57, 170, 255, 0.55);
       border-radius: 24px;
       background: var(--panel);
-
       box-shadow:
         0 0 35px rgba(0, 110, 255, 0.13),
         inset 0 0 25px rgba(0, 110, 255, 0.035);
@@ -77,7 +62,6 @@
       left: 15%;
       width: 70%;
       height: 2px;
-
       background: linear-gradient(
         90deg,
         transparent,
@@ -90,16 +74,13 @@
       width: 100px;
       height: 100px;
       margin: 0 auto 20px;
-
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-
       border: 2px solid var(--cyan);
       border-radius: 50%;
       background: #07162e;
-
       box-shadow:
         0 0 20px rgba(22, 139, 255, 0.4),
         0 0 45px rgba(22, 139, 255, 0.12);
@@ -137,12 +118,10 @@
       gap: 8px;
       margin: 23px 0;
       padding: 9px 15px;
-
       border: 1px solid rgba(22, 139, 255, 0.4);
       border-radius: 30px;
       color: #65c3ff;
       background: rgba(10, 36, 69, 0.7);
-
       font-size: 11px;
       letter-spacing: 1px;
     }
@@ -173,12 +152,10 @@
       width: 100%;
       padding: 15px;
       outline: none;
-
       border: 1px solid #244775;
       border-radius: 11px;
       background: #060d1d;
       color: white;
-
       font-size: 15px;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
@@ -196,17 +173,14 @@
       width: 100%;
       margin-top: 15px;
       padding: 15px;
-
       border: none;
       border-radius: 11px;
       background: linear-gradient(100deg, #0879ff, #24b5ff);
       color: white;
-
       font-size: 14px;
       font-weight: 800;
       letter-spacing: 0.5px;
       cursor: pointer;
-
       box-shadow: 0 5px 20px rgba(0, 110, 255, 0.18);
       transition: transform 0.2s, opacity 0.2s;
     }
@@ -224,16 +198,13 @@
     .status-box {
       margin-top: 17px;
       padding: 12px;
-
       border: 1px solid rgba(50, 100, 160, 0.3);
       border-radius: 10px;
       background: rgba(4, 12, 28, 0.7);
       color: #9eb0ce;
-
       font-size: 12px;
       line-height: 1.8;
       overflow-wrap: anywhere;
-      white-space: pre-line;
     }
 
     .notice {
@@ -246,10 +217,8 @@
     .footer {
       margin-top: 25px;
       padding-top: 17px;
-
       border-top: 1px solid rgba(90, 130, 180, 0.15);
       color: #607895;
-
       font-size: 11px;
       line-height: 1.8;
     }
@@ -279,18 +248,16 @@
 
   <main class="container">
 
+    <!-- YOUR LOGO -->
     <div class="logo">
       <img
         src="./logo.jpg"
         alt="SHAN MINI BOT V1 Logo"
-        onerror="
-          this.style.display='none';
-          this.parentElement.innerHTML=
-          '<span style=&quot;color:#39c5ff;font-size:25px;font-weight:bold&quot;>SHAN</span>';
-        "
+        onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=&quot;color:#39c5ff;font-size:25px;font-weight:bold&quot;>SHAN</span>';"
       >
     </div>
 
+    <!-- WEBSITE TITLE -->
     <h1>SHAN <span>MINI BOT V1</span></h1>
 
     <p class="subtitle">
@@ -303,6 +270,7 @@
       PAIRING INTERFACE
     </div>
 
+    <!-- PAIR FORM -->
     <h2 class="form-title">🔐 Connect WhatsApp</h2>
 
     <form id="pairForm">
@@ -335,13 +303,16 @@
       class="status-box"
       role="status"
       aria-live="polite"
-    >Enter your WhatsApp number with country code.
-Example: 947XXXXXXXX</div>
+    >
+      Enter your WhatsApp number with country code.
+      <br>
+      Example: 947XXXXXXXX
+    </div>
 
     <p class="notice">
       Use only a WhatsApp account you own or are authorized to link.
       <br>
-      Pairing requires a working and correctly configured API.
+      A secure pairing API must be configured to generate real codes.
     </p>
 
     <footer class="footer">
@@ -352,90 +323,55 @@ Example: 947XXXXXXXX</div>
 
   </main>
 
-  <script>
-    /*
-     * IMPORTANT:
-     * Replace this with your actual Render service URL.
-     * Example format: https://your-service-name.onrender.com
-     */
-    const API_URL = "https://shan-md-mini.onrender.com/";
+<script>
+const API_URL = "https://shan-md-mini.onrender.com";
 
-    const form = document.getElementById("pairForm");
-    const phoneInput = document.getElementById("phone");
-    const button = document.getElementById("pairButton");
-    const statusBox = document.getElementById("status");
+async function getPairCode() {
+  const phoneInput = document.getElementById("phone");
+  const statusBox = document.getElementById("status");
+  const codeBox = document.getElementById("pairCode");
 
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
+  const phone = phoneInput.value.replace(/\D/g, "");
 
-      const phone = phoneInput.value.replace(/\D/g, "");
+  if (!phone) {
+    statusBox.textContent = "❌ WhatsApp number එක ඇතුළත් කරන්න!";
+    return;
+  }
 
-      if (phone.length < 8 || phone.length > 15) {
-        statusBox.textContent =
-          "❌ Please enter a valid international phone number.";
-        return;
-      }
+  statusBox.textContent = "⏳ Pairing code එක ලබාගනිමින්...";
+  codeBox.textContent = "";
 
-      if (
-        API_URL.includes("YOUR-RENDER-SERVICE") ||
-        !API_URL.startsWith("https://")
-      ) {
-        statusBox.textContent =
-          "❌ Render API URL එක තවම configure කරලා නැහැ.";
-        return;
-      }
-
-      button.disabled = true;
-      button.textContent = "GENERATING...";
-      statusBox.textContent =
-        "⏳ Connecting to SHAN MINI BOT API...";
-
-      try {
-        const response = await fetch(`${API_URL}/api/pair`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ phone })
-        });
-
-        const data = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          throw new Error(
-            data.error ||
-            data.message ||
-            `API request failed (${response.status}).`
-          );
-        }
-
-        const pairCode =
-          data.code ||
-          data.pairCode ||
-          data.pairingCode;
-
-        if (pairCode) {
-          statusBox.textContent =
-            `✅ Pair Code: ${pairCode}\n\n` +
-            "WhatsApp → Linked Devices → Link a Device වෙත යන්න.";
-        } else {
-          statusBox.textContent =
-            data.message ||
-            "❌ API එකෙන් Pair Code එකක් ලැබුණේ නැහැ.";
-        }
-
-      } catch (error) {
-        console.error("Pair API error:", error);
-
-        statusBox.textContent =
-          "❌ " + error.message +
-          "\n\nRender service එක, API URL එක සහ CORS settings පරීක්ෂා කරන්න.";
-      } finally {
-        button.disabled = false;
-        button.textContent = "GENERATE PAIR CODE";
-      }
+  try {
+    const response = await fetch(`${API_URL}/api/pair`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        number: phone
+      })
     });
-  </script>
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      statusBox.textContent =
+        "❌ " + (data.error || "Pairing code ලබාගන්න බැහැ.");
+      return;
+    }
+
+    codeBox.textContent = data.code || data.pairCode || data.pairingCode || "";
+    statusBox.textContent = codeBox.textContent
+      ? "✅ Pairing code එක ලැබුණා!"
+      : "❌ Pairing code එක response එකේ නැහැ.";
+
+  } catch (error) {
+    statusBox.textContent =
+      "❌ API එකට connect වෙන්න බැහැ. නැවත උත්සාහ කරන්න.";
+    console.error(error);
+  }
+}
+</script>
 
 </body>
 </html>
