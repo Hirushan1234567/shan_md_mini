@@ -13,7 +13,7 @@ import {
 const app = express();
 
 /* =========================================
-   CONFIGURATION
+   SHAN MINI BOT V1 - CONFIGURATION
 ========================================= */
 
 const PORT = Number(process.env.PORT || process.env.API_PORT || 3000);
@@ -31,15 +31,13 @@ const API_KEY = process.env.API_KEY || "";
 
 const WEBSITE_ORIGIN =
   process.env.WEBSITE_ORIGIN ||
-  process.env.CORS_ORIGIN ||
-  "https://beautiful-sable-ec743d.netlify.app";
+  "https://hirushan1234567.github.io";
 
 const PAIR_TIMEOUT_MS = 120000;
 
 fs.mkdirSync(SESSION_DIR, { recursive: true });
 
 app.disable("x-powered-by");
-
 app.use(express.json({ limit: "10kb" }));
 
 /* =========================================
@@ -54,27 +52,15 @@ app.use((req, res, next) => {
 
   const origin = req.headers.origin;
 
-  if (
-    !origin ||
-    allowedOrigins.includes("*") ||
-    allowedOrigins.includes(origin)
-  ) {
+  if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes("*")) {
     res.setHeader(
       "Access-Control-Allow-Origin",
-      allowedOrigins.includes("*") ? "*" : (origin || "*")
+      allowedOrigins.includes("*") ? "*" : (origin || allowedOrigins[0] || "*")
     );
   }
 
-  res.setHeader(
-    "Vary",
-    "Origin"
-  );
-
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS"
-  );
-
+  res.setHeader("Vary", "Origin");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader(
     "Access-Control-Allow-Headers",
     "Content-Type, x-api-key"
@@ -102,10 +88,6 @@ function makeUserId(phone) {
     .slice(0, 24);
 }
 
-function clearRequest(phone) {
-  requests.delete(phone);
-}
-
 /* =========================================
    HEALTH CHECK
 ========================================= */
@@ -128,11 +110,24 @@ app.get("/api/health", (_req, res) => {
 });
 
 /* =========================================
-   SESSION STATUS
+   API STATUS
 ========================================= */
 
-app.get("/api/status", (_req, res) => {
-  res.json({
+app.get("/api/status", (req, res) => {
+  const phone = String(req.query.number || "").replace(/\D/g, "");
+
+  if (phone) {
+    const userId = makeUserId(phone);
+    const session = sessions.get(userId);
+
+    return res.json({
+      success: true,
+      connected: Boolean(session?.sock?.user),
+      active: Boolean(session)
+    });
+  }
+
+  return res.json({
     success: true,
     status: "online",
     activeSessions: sessions.size,
@@ -141,7 +136,7 @@ app.get("/api/status", (_req, res) => {
 });
 
 /* =========================================
-   PAIR API
+   PAIRING API
 ========================================= */
 
 app.post("/api/pair", async (req, res) => {
@@ -159,10 +154,6 @@ app.post("/api/pair", async (req, res) => {
     });
   }
 
-  /*
-   * If API_KEY is configured, the website must send
-   * the matching x-api-key header.
-   */
   if (API_KEY && req.get("x-api-key") !== API_KEY) {
     return res.status(401).json({
       success: false,
@@ -170,13 +161,15 @@ app.post("/api/pair", async (req, res) => {
     });
   }
 
-  let phone = String(req.body?.phone || "")
-    .replace(/\D/g, "");
+  // Accept both "phone" and "number" from the website.
+  const rawPhone = req.body?.phone ?? req.body?.number ?? "";
+
+  const phone = String(rawPhone).replace(/\D/g, "");
 
   if (!/^\d{8,15}$/.test(phone)) {
     return res.status(400).json({
       success: false,
-      error: "Enter a valid international phone number without +."
+      error: "Invalid phone number. Include your country code without +."
     });
   }
 
@@ -205,7 +198,7 @@ app.post("/api/pair", async (req, res) => {
     if (state.creds.registered) {
       return res.status(409).json({
         success: false,
-        error: "This WhatsApp account already has a saved session."
+        error: "This WhatsApp account already has a saved session. Use the existing session."
       });
     }
 
@@ -240,7 +233,9 @@ app.post("/api/pair", async (req, res) => {
       success: true,
       code,
       pairCode: code,
-      message: "Open WhatsApp Linked Devices and enter the pairing code."
+      pairingCode: code,
+      number: phone,
+      message: "Open WhatsApp > Linked Devices > Link with phone number and enter the code."
     });
 
   } catch (error) {
@@ -265,7 +260,7 @@ app.post("/api/pair", async (req, res) => {
   } finally {
     if (requestReserved) {
       setTimeout(() => {
-        clearRequest(phone);
+        requests.delete(phone);
       }, PAIR_TIMEOUT_MS).unref();
     }
   }
@@ -278,9 +273,7 @@ app.post("/api/pair", async (req, res) => {
 app.use((error, _req, res, _next) => {
   console.error("API error:", error?.message || error);
 
-  if (res.headersSent) {
-    return;
-  }
+  if (res.headersSent) return;
 
   res.status(500).json({
     success: false,
@@ -293,19 +286,27 @@ app.use((error, _req, res, _next) => {
 ========================================= */
 
 const server = app.listen(PORT, "0.0.0.0", () => {
-  console.log(`SHAN MINI BOT API listening on port ${PORT}`);
+  console.log("╭─────────────────────────────╮");
+  console.log("│     💙 SHAN MINI BOT V1     │");
+  console.log("│      PAIRING API ONLINE     │");
+  console.log("╰─────────────────────────────╯");
+  console.log(`🌐 Port: ${PORT}`);
+  console.log(`📂 Sessions: ${SESSION_DIR}`);
+  console.log(`🔗 Website: ${WEBSITE_ORIGIN}`);
 });
 
 function shutdown() {
   console.log("Shutting down SHAN MINI BOT API...");
 
-  server.close(() => {
-    process.exit(0);
-  });
+  for (const session of sessions.values()) {
+    try {
+      session.sock.end(undefined);
+    } catch {}
+  }
 
-  setTimeout(() => {
-    process.exit(1);
-  }, 10000).unref();
+  server.close(() => process.exit(0));
+
+  setTimeout(() => process.exit(1), 10000).unref();
 }
 
 process.on("SIGTERM", shutdown);
