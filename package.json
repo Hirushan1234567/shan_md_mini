@@ -5,23 +5,17 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "start:api": "node api.js",
-    "start:all": "node start.js"
+    "start": "node index.js"
   },
   "engines": {
     "node": "22.x"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "latest",
-    "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "dotenv": "^16.4.5",
-    "express": "^4.21.2",
     "mongoose": "^8.5.0",
     "pino": "^9.3.0",
     "wa-sticker-formatter": "^4.4.4",
-    "concurrently": "^9.1.0",
-    "yt-search": "^2.12.1",
-    "ytdl-core": "^4.11.5"
+    "ytmusic-api": "^5.3.0"
   }
 }
