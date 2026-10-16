@@ -380,162 +380,125 @@
   </main>
 
   <script>
-    const API_URL = "shan-mini-bot-production.up.railway.app";
+  const API_URL = "shan-mini-bot-production.up.railway.app";
 
-    const form = document.getElementById("pairForm");
-    const phoneInput = document.getElementById("phone");
-    const pairButton = document.getElementById("pairButton");
-    const statusBox = document.getElementById("status");
-    const pairCodeBox = document.getElementById("pairCodeBox");
-    const pairCodeElement = document.getElementById("pairCode");
-    const copyButton = document.getElementById("copyButton");
+  const form = document.getElementById("pairForm");
+  const phoneInput = document.getElementById("phone");
+  const pairButton = document.getElementById("pairButton");
+  const statusBox = document.getElementById("status");
+  const pairCodeBox = document.getElementById("pairCodeBox");
+  const pairCodeElement = document.getElementById("pairCode");
+  const copyButton = document.getElementById("copyButton");
 
-    function showStatus(message, type = "") {
-      statusBox.textContent = message;
-      statusBox.className = "status-box show";
+  function showStatus(message, type = "") {
+    statusBox.textContent = message;
+    statusBox.className = "status-box show";
 
-      if (type) {
-        statusBox.classList.add(type);
-      }
+    if (type) statusBox.classList.add(type);
+  }
+
+  function hidePairCode() {
+    pairCodeBox.style.display = "none";
+    pairCodeElement.textContent = "";
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const phone = phoneInput.value.replace(/\D/g, "");
+
+    if (phone.length < 8 || phone.length > 15) {
+      showStatus("❌ නිවැරදි WhatsApp number එක ඇතුළත් කරන්න.", "error");
+      return;
     }
 
-    function hidePairCode() {
-      pairCodeBox.style.display = "none";
-      pairCodeElement.textContent = "";
-    }
+    pairButton.disabled = true;
+    pairButton.textContent = "GENERATING...";
+    hidePairCode();
 
-    form.addEventListener("submit", async function (event) {
-      event.preventDefault();
+    showStatus("⏳ Pair Code එක ලබාගනිමින්...");
 
-      const phone = phoneInput.value.replace(/\D/g, "");
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 120000);
 
-      if (!phone) {
-        showStatus("❌ WhatsApp number එක ඇතුළත් කරන්න.", "error");
-        return;
-      }
+    try {
+      const response = await fetch(`${API_URL}/api/pair`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ phone }),
+        signal: controller.signal
+      });
 
-      if (phone.length < 8 || phone.length > 15) {
-        showStatus(
-          "❌ Number එක පරීක්ෂා කරන්න. Country code සමඟ නිවැරදි number එක ඇතුළත් කරන්න.",
-          "error"
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.error || data.message || `HTTP Error ${response.status}`
         );
-        return;
       }
 
-      pairButton.disabled = true;
-      pairButton.textContent = "GENERATING...";
-      hidePairCode();
-      showStatus("⏳ Pairing code ලබාගනිමින්... කරුණාකර රැඳී සිටින්න.");
-
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 45000);
-
-      try {
-        const response = await fetch(`${API_URL}/api/pair`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify({
-            number: phone
-          }),
-          signal: controller.signal
-        });
-
-        let data;
-
-        try {
-          data = await response.json();
-        } catch {
-          throw new Error(
-            "API එකෙන් නිවැරදි JSON response එකක් ලැබුණේ නැහැ."
-          );
-        }
-
-        if (!response.ok || !data.success) {
-          const message =
-            data.error ||
-            data.message ||
-            `API request failed (${response.status})`;
-
-          throw new Error(message);
-        }
-
-        const code =
-          data.code ||
-          data.pairCode ||
-          data.pairingCode ||
-          "";
-
-        if (!code) {
-          console.error("Pair API response:", data);
-
-          throw new Error(
-            "API එකෙන් Pair Code එකක් ලැබුණේ නැහැ. Backend logs පරීක්ෂා කරන්න."
-          );
-        }
-
-        pairCodeElement.textContent = code;
-        pairCodeBox.style.display = "block";
-
-        showStatus(
-          "✅ Pair Code එක ලැබුණා! දැන් WhatsApp Linked Devices වෙත යන්න.",
-          "success"
-        );
-
-      } catch (error) {
-        console.error("Pair API Error:", error);
-
-        if (error.name === "AbortError") {
-          showStatus(
-            "❌ API response එක ප්‍රමාදයි. Render server එක සහ backend logs පරීක්ෂා කර නැවත උත්සාහ කරන්න.",
-            "error"
-          );
-        } else if (error instanceof TypeError) {
-          showStatus(
-            "❌ API එකට connect වෙන්න බැහැ. Backend URL, server status සහ CORS settings පරීක්ෂා කරන්න.",
-            "error"
-          );
-        } else {
-          showStatus("❌ " + error.message, "error");
-        }
-
-      } finally {
-        clearTimeout(timeout);
-        pairButton.disabled = false;
-        pairButton.textContent = "GENERATE PAIR CODE";
-      }
-    });
-
-    copyButton.addEventListener("click", async function () {
-      const code = pairCodeElement.textContent.trim();
+      const code = data.code || data.pairCode || data.pairingCode;
 
       if (!code) {
-        showStatus("❌ Copy කිරීමට Pair Code එකක් නැහැ.", "error");
-        return;
+        throw new Error("API එකෙන් Pair Code එකක් ලැබුණේ නැහැ.");
       }
 
-      try {
-        await navigator.clipboard.writeText(code);
-        copyButton.textContent = "✅ COPIED!";
-      } catch {
-        const temporaryInput = document.createElement("textarea");
-        temporaryInput.value = code;
-        document.body.appendChild(temporaryInput);
-        temporaryInput.select();
+      pairCodeElement.textContent = code;
+      pairCodeBox.style.display = "block";
 
-        const copied = document.execCommand("copy");
-        temporaryInput.remove();
+      showStatus(
+        "✅ Pair Code එක ලැබුණා! WhatsApp → Linked Devices වෙත යන්න.",
+        "success"
+      );
 
-        copyButton.textContent = copied ? "✅ COPIED!" : "COPY CODE";
+    } catch (error) {
+      console.error("Pair API Error:", error);
+
+      if (error.name === "AbortError") {
+        showStatus("❌ API response එක ප්‍රමාදයි. නැවත උත්සාහ කරන්න.", "error");
+      } else if (error instanceof TypeError) {
+        showStatus(
+          "❌ API එකට connect වෙන්න බැහැ. Railway URL සහ CORS පරීක්ෂා කරන්න.",
+          "error"
+        );
+      } else {
+        showStatus("❌ " + error.message, "error");
       }
 
-      setTimeout(() => {
-        copyButton.textContent = "📋 COPY CODE";
-      }, 2000);
-    });
-  </script>
+    } finally {
+      clearTimeout(timeout);
+      pairButton.disabled = false;
+      pairButton.textContent = "GENERATE PAIR CODE";
+    }
+  });
 
+  copyButton.addEventListener("click", async () => {
+    const code = pairCodeElement.textContent.trim();
+
+    if (!code) return;
+
+    try {
+      await navigator.clipboard.writeText(code);
+      copyButton.textContent = "✅ COPIED!";
+    } catch {
+      const input = document.createElement("textarea");
+      input.value = code;
+      document.body.appendChild(input);
+      input.select();
+
+      const copied = document.execCommand("copy");
+      input.remove();
+
+      copyButton.textContent = copied ? "✅ COPIED!" : "COPY CODE";
+    }
+
+    setTimeout(() => {
+      copyButton.textContent = "📋 COPY CODE";
+    }, 2000);
+  });
+</script>
 </body>
 </html>
