@@ -1630,22 +1630,21 @@ async function sendWelcomeMessage(ctx, sock) {
     const number = cleanNumber(myJid);
 
     const caption =
-`╭━━〔 🤖 SHAN MINI BOT V1 〕━━╮
+`╭─「 💙 SHAN MINI BOT 」─╮
 
-👋 Welcome!
+👋 Welcome to SHAN MINI BOT!
 
-✅ ඔබගේ WhatsApp අංකය සාර්ථකව
-   බොට් එකට සම්බන්ධ වුණා.
-
+💙 Your WhatsApp is now connected.
 📱 Number : ${number}
-🎯 Prefix : ${prefix}
-🟢 Status : ONLINE
+⚡ Prefix : ${prefix}
+🟢 Status : Online
 
-📌 Commands බලන්න:
-   ${prefix}menu
+✨ Enjoy Your Bot Experience!
 
-╰━━━━━━━━━━━━━━━━━━━━━━╯
-> © SHAN MINI BOT V1`;
+🚀 Full Version Coming Soon...
+⚠️ This is not the Full Version yet!
+
+╰─「 ⚡ VERSION 1.0 」─╯`;
 
     let image = null;
 
