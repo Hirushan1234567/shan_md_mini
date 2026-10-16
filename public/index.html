@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050816">
 
   <title>SHAN MINI BOT V1 | Pair Website</title>
-  <meta name="theme-color" content="#050b18">
-  <meta name="description" content="SHAN MINI BOT V1 WhatsApp Pairing Website">
+
+  <meta name="description" content="SHAN MINI BOT V1 WhatsApp Pair Website">
 
   <style>
     * {
@@ -16,14 +17,12 @@
     }
 
     :root {
-      --blue: #00bfff;
-      --cyan: #00f5ff;
-      --bg: #050b18;
-      --card: rgba(10, 24, 48, 0.88);
-      --text: #eafaff;
-      --muted: #8fa9c9;
-      --green: #00ff9d;
-      --red: #ff5577;
+      --blue: #168bff;
+      --cyan: #39c5ff;
+      --background: #050816;
+      --panel: rgba(8, 17, 38, 0.96);
+      --text: #ffffff;
+      --muted: #9eb0ce;
     }
 
     body {
@@ -34,420 +33,491 @@
       padding: 22px;
       overflow-x: hidden;
       background:
-        radial-gradient(circle at 15% 15%, #003b72 0, transparent 35%),
-        radial-gradient(circle at 85% 85%, #001d4d 0, transparent 35%),
-        var(--bg);
+        radial-gradient(ellipse at 50% 0%, #103a70 0%, transparent 55%),
+        radial-gradient(ellipse at 0% 100%, #071b3d 0%, transparent 45%),
+        var(--background);
       color: var(--text);
       font-family: Arial, Helvetica, sans-serif;
     }
 
-    .background-glow {
-      position: fixed;
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      background: var(--blue);
-      filter: blur(150px);
-      opacity: 0.15;
-      pointer-events: none;
-    }
-
-    .glow-one {
-      top: -70px;
-      left: -70px;
-    }
-
-    .glow-two {
-      bottom: -70px;
-      right: -70px;
-      background: #0055ff;
-    }
-
     .container {
-      width: 100%;
-      max-width: 430px;
       position: relative;
-      padding: 30px 24px;
+      width: 100%;
+      max-width: 420px;
+      padding: 32px 25px;
       text-align: center;
-      border: 1px solid rgba(0, 191, 255, 0.45);
+      overflow: hidden;
+      border: 1px solid rgba(57, 170, 255, 0.55);
       border-radius: 24px;
-      background: var(--card);
+      background: var(--panel);
       box-shadow:
-        0 0 25px rgba(0, 191, 255, 0.12),
-        inset 0 0 25px rgba(0, 191, 255, 0.035);
-      backdrop-filter: blur(15px);
+        0 0 35px rgba(0, 110, 255, 0.13),
+        inset 0 0 25px rgba(0, 110, 255, 0.035);
     }
 
-    .logo-wrapper {
-      width: 105px;
-      height: 105px;
-      margin: 0 auto 17px;
-      padding: 4px;
-      border: 2px solid var(--cyan);
-      border-radius: 50%;
-      box-shadow: 0 0 22px rgba(0, 245, 255, 0.35);
-      overflow: hidden;
+    .container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 15%;
+      width: 70%;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        var(--cyan),
+        transparent
+      );
     }
 
     .logo {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 2px solid var(--cyan);
+      border-radius: 50%;
+      background: #07162e;
+      box-shadow:
+        0 0 20px rgba(22, 139, 255, 0.4),
+        0 0 45px rgba(22, 139, 255, 0.12);
+    }
+
+    .logo img {
+      display: block;
       width: 100%;
       height: 100%;
+      object-fit: contain;
       border-radius: 50%;
-      object-fit: cover;
     }
 
     h1 {
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: 1px;
+      font-size: 25px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+    }
+
+    h1 span {
       color: var(--cyan);
-      text-shadow: 0 0 15px rgba(0, 191, 255, 0.4);
+      text-shadow: 0 0 14px rgba(57, 197, 255, 0.3);
     }
 
     .subtitle {
-      margin-top: 9px;
+      margin-top: 12px;
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.6;
+      line-height: 1.8;
     }
 
     .badge {
-      display: inline-block;
-      margin: 17px 0 24px;
-      padding: 8px 14px;
-      border: 1px solid rgba(0, 245, 255, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 23px 0;
+      padding: 9px 15px;
+      border: 1px solid rgba(22, 139, 255, 0.4);
       border-radius: 30px;
-      color: var(--cyan);
-      background: rgba(0, 191, 255, 0.08);
+      color: #65c3ff;
+      background: rgba(10, 36, 69, 0.7);
       font-size: 11px;
-      font-weight: bold;
       letter-spacing: 1px;
     }
 
-    .form-label {
-      display: block;
-      margin-bottom: 10px;
-      text-align: left;
-      color: #c9eaff;
-      font-size: 13px;
-      font-weight: bold;
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #35e89a;
+      box-shadow: 0 0 8px #35e89a;
     }
 
-    .phone-input {
+    .form-title {
+      margin-bottom: 18px;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 9px;
+      text-align: left;
+      color: #d6e5ff;
+      font-size: 13px;
+    }
+
+    input {
       width: 100%;
       padding: 15px;
-      border: 1px solid rgba(0, 191, 255, 0.35);
-      border-radius: 12px;
       outline: none;
-      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid #244775;
+      border-radius: 11px;
+      background: #060d1d;
       color: white;
-      font-size: 16px;
-      transition: 0.25s;
+      font-size: 15px;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    .phone-input:focus {
+    input::placeholder {
+      color: #647895;
+    }
+
+    input:focus {
       border-color: var(--cyan);
-      box-shadow: 0 0 15px rgba(0, 191, 255, 0.15);
-    }
-
-    .phone-input::placeholder {
-      color: #6885a5;
-    }
-
-    .hint {
-      margin-top: 9px;
-      text-align: left;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.6;
+      box-shadow: 0 0 13px rgba(22, 139, 255, 0.18);
     }
 
     .pair-button {
       width: 100%;
-      margin-top: 21px;
+      margin-top: 15px;
       padding: 15px;
       border: none;
-      border-radius: 12px;
-      background: linear-gradient(100deg, #0077ff, #00d9ff);
-      color: #001020;
+      border-radius: 11px;
+      background: linear-gradient(100deg, #0879ff, #24b5ff);
+      color: white;
       font-size: 14px;
-      font-weight: 900;
-      letter-spacing: 1px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
       cursor: pointer;
-      box-shadow: 0 5px 22px rgba(0, 191, 255, 0.2);
-      transition: 0.25s;
+      box-shadow: 0 5px 20px rgba(0, 110, 255, 0.18);
+      transition: transform 0.2s, opacity 0.2s;
     }
 
-    .pair-button:hover:not(:disabled) {
+    .pair-button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 28px rgba(0, 191, 255, 0.35);
     }
 
     .pair-button:disabled {
-      cursor: wait;
       opacity: 0.6;
+      cursor: wait;
+      transform: none;
+    }
+
+    .code-box {
+      margin-top: 17px;
+      padding: 14px;
+      border: 1px dashed var(--cyan);
+      border-radius: 10px;
+      background: #060d1d;
+      color: var(--cyan);
+      font-family: "Courier New", monospace;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 4px;
+      text-shadow: 0 0 14px rgba(57, 197, 255, 0.3);
+      cursor: pointer;
+      user-select: all;
+    }
+
+    .code-box:empty {
+      display: none;
     }
 
     .status-box {
-      display: none;
-      margin-top: 20px;
-      padding: 13px;
-      border: 1px solid rgba(0, 191, 255, 0.2);
-      border-radius: 12px;
-      background: rgba(0, 0, 0, 0.2);
-      color: #ccefff;
-      font-size: 13px;
-      line-height: 1.6;
-      overflow-wrap: anywhere;
-    }
-
-    .status-box.show {
-      display: block;
-    }
-
-    .status-box.error {
-      border-color: rgba(255, 85, 119, 0.4);
-      color: #ff9bad;
-    }
-
-    .status-box.success {
-      border-color: rgba(0, 255, 157, 0.35);
-      color: var(--green);
-    }
-
-    .pair-code-box {
-      display: none;
       margin-top: 17px;
-      padding: 20px 12px;
-      border: 1px solid rgba(0, 245, 255, 0.55);
-      border-radius: 15px;
-      background: rgba(0, 191, 255, 0.07);
-      box-shadow: 0 0 20px rgba(0, 191, 255, 0.08);
-    }
-
-    .pair-code-label {
-      margin-bottom: 12px;
-      color: var(--muted);
+      padding: 12px;
+      border: 1px solid rgba(50, 100, 160, 0.3);
+      border-radius: 10px;
+      background: rgba(4, 12, 28, 0.7);
+      color: #9eb0ce;
       font-size: 12px;
-      letter-spacing: 1px;
-    }
-
-    .pair-code {
-      color: var(--cyan);
-      font-family: monospace;
-      font-size: 29px;
-      font-weight: 900;
-      letter-spacing: 5px;
+      line-height: 1.8;
       overflow-wrap: anywhere;
-      text-shadow: 0 0 15px rgba(0, 245, 255, 0.35);
     }
 
-    .copy-button {
-      margin-top: 15px;
-      padding: 10px 18px;
-      border: 1px solid var(--cyan);
-      border-radius: 9px;
-      background: transparent;
-      color: var(--cyan);
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .steps {
-      margin-top: 25px;
-      padding: 17px;
-      border-radius: 13px;
-      background: rgba(0, 0, 0, 0.2);
-      text-align: left;
-    }
-
-    .steps h3 {
-      margin-bottom: 12px;
-      color: var(--cyan);
-      font-size: 13px;
-    }
-
-    .steps p {
-      margin-top: 9px;
-      color: #b1c9e5;
-      font-size: 12px;
-      line-height: 1.6;
-    }
-
-    .footer {
-      margin-top: 24px;
-      color: #617e9f;
+    .notice {
+      margin-top: 16px;
+      color: #7488a8;
       font-size: 11px;
       line-height: 1.8;
     }
 
-    .footer strong {
-      color: var(--cyan);
+    .footer {
+      margin-top: 25px;
+      padding-top: 17px;
+      border-top: 1px solid rgba(90, 130, 180, 0.15);
+      color: #607895;
+      font-size: 11px;
+      line-height: 1.8;
+    }
+
+    .footer span {
+      color: #36b8ff;
     }
 
     @media (max-width: 380px) {
       .container {
-        padding: 25px 18px;
+        padding: 27px 19px;
       }
 
       h1 {
         font-size: 22px;
       }
 
-      .pair-code {
-        font-size: 24px;
-        letter-spacing: 3px;
+      .logo {
+        width: 85px;
+        height: 85px;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="background-glow glow-one"></div>
-  <div class="background-glow glow-two"></div>
 
   <main class="container">
 
-    <div class="logo-wrapper">
+    <!-- YOUR LOGO -->
+    <div class="logo">
       <img
-        class="logo"
         src="./logo.jpg"
-        alt="SHAN MINI BOT Logo"
-        onerror="this.style.display='none';"
+        alt="SHAN MINI BOT V1 Logo"
+        onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=&quot;color:#39c5ff;font-size:25px;font-weight:bold&quot;>SHAN</span>';"
       >
     </div>
 
-    <h1>SHAN MINI BOT V1</h1>
+    <!-- WEBSITE TITLE -->
+    <h1>SHAN <span>MINI BOT V1</span></h1>
 
     <p class="subtitle">
-      Connect your WhatsApp account securely<br>
-      Generate your pairing code below.
+      WhatsApp Multi-Session Pair Website<br>
+      Connect your own WhatsApp account.
     </p>
 
-    <div class="badge">⚡ WHATSAPP PAIRING SYSTEM</div>
+    <div class="badge">
+      <span class="status-dot"></span>
+      PAIRING INTERFACE
+    </div>
+
+    <!-- PAIR FORM -->
+    <h2 class="form-title">🔐 Connect WhatsApp</h2>
 
     <form id="pairForm">
-      <label class="form-label" for="phone">
-        📱 WhatsApp Phone Number
-      </label>
+
+      <label for="phone">WhatsApp Number</label>
 
       <input
-        type="tel"
         id="phone"
-        class="phone-input"
-        placeholder="Example: 94771234567"
-        inputmode="numeric"
+        name="phone"
+        type="tel"
+        placeholder="Example: 947XXXXXXXX"
         autocomplete="tel"
-        maxlength="15"
+        inputmode="numeric"
+        maxlength="20"
         required
       >
 
-      <p class="hint">
-        Country code සමඟ number එක ඇතුළත් කරන්න.
-        උදා: Sri Lanka සඳහා 94xxxxxxxxx
-      </p>
-
-      <button type="submit" id="pairButton" class="pair-button">
+      <button
+        id="pairButton"
+        class="pair-button"
+        type="submit"
+      >
         GENERATE PAIR CODE
       </button>
+
     </form>
 
-    <div id="status" class="status-box" role="status" aria-live="polite"></div>
+    <!-- PAIR CODE (code එක ආවම මෙතන පෙන්නනවා, tap කළොත් copy වෙනවා) -->
+    <div
+      id="pairCode"
+      class="code-box"
+      title="Tap to copy"
+    ></div>
 
-    <div id="pairCodeBox" class="pair-code-box">
-      <div class="pair-code-label">YOUR WHATSAPP PAIR CODE</div>
-      <div id="pairCode" class="pair-code"></div>
-      <button type="button" id="copyButton" class="copy-button">
-        📋 COPY CODE
-      </button>
+    <div
+      id="status"
+      class="status-box"
+      role="status"
+      aria-live="polite"
+    >
+      Enter your WhatsApp number with country code.
+      <br>
+      Example: 947XXXXXXXX
     </div>
 
-    <div class="steps">
-      <h3>📌 HOW TO CONNECT</h3>
-      <p>① ඉහළින් ඔබගේ WhatsApp number එක ඇතුළත් කරන්න.</p>
-      <p>② GENERATE PAIR CODE button එක ඔබන්න.</p>
-      <p>③ WhatsApp → Linked Devices වෙත යන්න.</p>
-      <p>④ Link a Device → Link with phone number තෝරන්න.</p>
-      <p>⑤ Website එකෙන් ලැබුණු code එක ඇතුළත් කරන්න.</p>
-    </div>
+    <p class="notice">
+      Use only a WhatsApp account you own or are authorized to link.
+      <br>
+      A secure pairing API must be configured to generate real codes.
+    </p>
 
-    <div class="footer">
-      <strong>SHAN MINI BOT V1</strong><br>
-      Blue Neon Pairing Website<br>
+    <footer class="footer">
+      <span>SHAN MINI BOT V1</span><br>
+      PREMIUM WHATSAPP BOT INTERFACE<br>
       © 2026 All Rights Reserved
-    </div>
+    </footer>
 
   </main>
 
 <script>
-const API_URL = "https://shan-mini-bot-production.up.railway.app";
+// Bot server URL (Render). මේ page එක bot server එකෙන්ම open කළොත් (onrender.com / localhost)
+// ඒ server එකටම call කරනවා. GitHub Pages වගේ වෙන තැනක host කළොත් පහත URL එක පාවිච්චි වෙනවා.
+const CONFIGURED_API_URL = "https://shan-mini-bot-production.up.railway.app";
+
+// GitHub Pages / file:// වලින් open කළොත් Railway URL එක, bot server එකෙන්ම open කළොත් ඒ server එකම
+const API_URL = (
+  location.protocol.startsWith("http") &&
+  !location.hostname.endsWith("github.io")
+)
+  ? location.origin
+  : CONFIGURED_API_URL.replace(/\/+$/, "");
 
 const form = document.getElementById("pairForm");
 const phoneInput = document.getElementById("phone");
-const pairButton = document.getElementById("pairButton");
 const statusBox = document.getElementById("status");
-const pairCodeBox = document.getElementById("pairCodeBox");
-const pairCodeElement = document.getElementById("pairCode");
-const copyButton = document.getElementById("copyButton");
+const codeBox = document.getElementById("pairCode");
+const pairButton = document.getElementById("pairButton");
 
-function showStatus(message, type = "") {
-  statusBox.textContent = message;
-  statusBox.className = "status-box show";
-  if (type) statusBox.classList.add(type);
+let pollTimer = null;
+
+function setStatus(text) {
+  statusBox.textContent = text;
 }
 
-function hidePairCode() {
-  pairCodeBox.style.display = "none";
-  pairCodeElement.textContent = "";
-}
-
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-
-  const number = phoneInput.value.replace(/\D/g, "");
-
-  if (number.length < 8 || number.length > 15) {
-    showStatus("❌ අංකය country code එක්ක දාන්න (උදා: 94752661225).", "error");
-    return;
+function stopPolling() {
+  if (pollTimer) {
+    clearInterval(pollTimer);
+    pollTimer = null;
   }
+}
 
-  hidePairCode();
-  pairButton.disabled = true;
-  showStatus("⏳ Pairing code එක ලබාගනිමින්...");
-
+async function requestJson(url, options = {}, timeoutMs = 60000) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 60000);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const response = await fetch(`${API_URL}/api/pair?number=${number}`, {
-      signal: controller.signal
-    });
+    const response = await fetch(url, { ...options, signal: controller.signal });
 
-    const data = await response.json().catch(() => ({}));
+    let data = {};
 
-    if (!response.ok || !data.success) {
-      showStatus("❌ " + (data.message || data.error || "Pairing code ලබාගන්න බැහැ."), "error");
+    try {
+      data = await response.json();
+    } catch {
+      data = {};
+    }
+
+    return { response, data };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Code එක දුන්නට පස්සේ WhatsApp එකේ link කරනකම් බලාගෙන ඉන්නවා
+function watchConnection(number) {
+  stopPolling();
+
+  const startedAt = Date.now();
+
+  pollTimer = setInterval(async () => {
+    if (Date.now() - startedAt > 150000) {
+      stopPolling();
       return;
     }
 
-    pairCodeElement.textContent = data.code;
-    pairCodeBox.style.display = "block";
-    showStatus("✅ Code එක ලැබුණා! WhatsApp → Linked Devices වල ඇතුළත් කරන්න.", "success");
+    try {
+      const { data } = await requestJson(
+        `${API_URL}/api/status?number=${number}`,
+        {},
+        15000
+      );
+
+      if (data && data.connected) {
+        stopPolling();
+        codeBox.textContent = "";
+        setStatus("🎉 සාර්ථකව connect වුණා! ඔබගේ WhatsApp එකට welcome message එකක් එනවා.");
+      }
+    } catch {}
+  }, 4000);
+}
+
+async function getPairCode(event) {
+  event.preventDefault();
+
+  const phone = phoneInput.value.replace(/\D/g, "");
+
+  if (!phone) {
+    setStatus("❌ WhatsApp number එක ඇතුළත් කරන්න!");
+    return;
+  }
+
+  if (phone.length < 8 || phone.length > 15) {
+    setStatus("❌ අංකය country code එක්ක දාන්න (උදා: 947XXXXXXXX).");
+    return;
+  }
+
+  stopPolling();
+  codeBox.textContent = "";
+  pairButton.disabled = true;
+
+  setStatus("⏳ Pairing code එක ලබාගනිමින්... (server එක නිදාගෙන නම් තත්පර 30ක් විතර යන්න පුළුවන්)");
+
+  try {
+    const { response, data } = await requestJson(
+      `${API_URL}/api/pair`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ number: phone })
+      },
+      60000
+    );
+
+    if (!response.ok || !data.success) {
+      if (response.status === 404) {
+        setStatus("❌ API එක හම්බුණේ නැහැ (404). Server එකේ අලුත් version එක deploy වෙලාද බලන්න.");
+      } else {
+        setStatus("❌ " + (data.message || data.error || "Pairing code ලබාගන්න බැහැ."));
+      }
+
+      return;
+    }
+
+    const code = data.code || data.pairCode || data.pairingCode || "";
+
+    if (!code) {
+      setStatus("❌ Pairing code එක response එකේ නැහැ.");
+      return;
+    }
+
+    codeBox.textContent = code;
+
+    setStatus(
+      "✅ Pairing code එක ලැබුණා!\n" +
+      "WhatsApp → Settings → Linked Devices → Link a device → " +
+      "Link with phone number instead → code එක ඇතුළත් කරන්න. (tap කළොත් copy වෙනවා)"
+    );
+
+    watchConnection(phone);
   } catch (error) {
-    showStatus("❌ Server එකට connect වෙන්න බැහැ, නැත්නම් timeout වුණා.", "error");
+    console.error(error);
+
+    if (error && error.name === "AbortError") {
+      setStatus("❌ Server එක ප්‍රතිචාර දැක්වුවේ නැහැ (timeout). ටිකක් පස්සේ ආයෙ උත්සාහ කරන්න.");
+    } else {
+      setStatus("❌ API එකට connect වෙන්න බැහැ. URL එක / server එක / CORS බලන්න.");
+    }
   } finally {
-    clearTimeout(timer);
     pairButton.disabled = false;
   }
-});
+}
 
-copyButton.addEventListener("click", async () => {
+// Code එක tap කළාම copy වෙනවා
+codeBox.addEventListener("click", async () => {
+  const code = codeBox.textContent.trim();
+
+  if (!code) {
+    return;
+  }
+
   try {
-    await navigator.clipboard.writeText(pairCodeElement.textContent.trim());
-    copyButton.textContent = "✅ COPIED";
-    setTimeout(() => (copyButton.textContent = "📋 COPY CODE"), 2000);
+    await navigator.clipboard.writeText(code);
+    setStatus("📋 Code එක copy වුණා: " + code);
   } catch {}
 });
+
+form.addEventListener("submit", getPairCode);
 </script>
+
 </body>
 </html>
