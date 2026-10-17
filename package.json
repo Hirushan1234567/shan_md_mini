@@ -16,6 +16,7 @@
     "mongoose": "^8.5.0",
     "pino": "^9.3.0",
     "wa-sticker-formatter": "^4.4.4",
+    "yt-search": "^2.12.1",
     "ytmusic-api": "^5.3.0"
   }
 }
