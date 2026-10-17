@@ -2293,7 +2293,7 @@ async function connectSession(ctx) {
         console.log("");
         console.log("╭━━〔 WHATSAPP CONNECTED 〕━━╮");
         console.log("┃");
-        console.log(`┃ ✅ Status  : ONLINE`);
+        console.log(`┃ 👨‍💻 Status  : ONLINE`);
         console.log(`┃ 🆔 Session : ${ctx.id}`);
         console.log(`┃ 📱 Number  : ${ctx.number}`);
         console.log("┃ 🤖 SHAN MINI BOT V1");
