@@ -16,7 +16,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { spawn } from 'child_process';
 
-const REPO = process.env.GITHUB_REPO || 'hirushan1234567/shan-mini-bot';
+const REPO = process.env.GITHUB_REPO || 'hirushan1234567/sha_nmini_bot';
 const TOKEN = process.env.GITHUB_TOKEN || '';
 const BRANCHES = process.env.GITHUB_BRANCH
   ? [process.env.GITHUB_BRANCH]
